@@ -66,8 +66,8 @@ SMTP_USER="your-email@gmail.com"
 SMTP_PASS="your-app-password"
 
 # Domain Configuration
-# This domain is used for email validation and placeholders throughout the app
-NEXT_PUBLIC_DOMAIN="example.com"
+# Used for email validation (user emails must end with this domain)
+ALLOWED_EMAIL_DOMAIN="example.com"
 
 # Superadmin Initial Setup
 SUPERADMIN_EMAIL="admin@example.com"
@@ -119,7 +119,7 @@ SMTP_PORT=587
 SMTP_SECURE=false
 SMTP_USER=<your-email>
 SMTP_PASS=<your-app-password>
-NEXT_PUBLIC_DOMAIN=example.com
+ALLOWED_EMAIL_DOMAIN=example.com
 SUPERADMIN_EMAIL=admin@example.com
 SUPERADMIN_PASSWORD=<secure-password>
 EMAIL_RATE_LIMIT=100

@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { serverEnv } from '@/lib/env'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 
-const ALLOWED_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN || 'example.com';
+const ALLOWED_DOMAIN = serverEnv.domain;
 
 const createUserSchema = z.object({
   email: z.string().email().refine(

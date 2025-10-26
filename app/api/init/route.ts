@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { serverEnv } from '@/lib/env'
 import bcrypt from 'bcryptjs'
 
-const ALLOWED_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN || 'example.com';
+const ALLOWED_DOMAIN = serverEnv.domain;
 
 // POST /api/init - Initialize superadmin (only works if no superadmin exists)
 export async function POST() {
