@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SUPERADMIN
+  USER
+}
+
+enum EmailStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model User {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  passwordHash    String
+  role            UserRole @default(USER)
+  fromAddress     String?  // Fixed "From" address for regular users
+  signatureHtml   String?  @db.Text // HTML signature
+  signatureEnabled Boolean @default(false) // Enable/disable signature
+  createdBy       String?  // ID of admin who created this user
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  emails        Email[]
+  creator       User?    @relation("UserCreator", fields: [createdBy], references: [id])
+  createdUsers  User[]   @relation("UserCreator")
+
+  @@index([email])
+  @@index([role])
+}
+
+model Email {
+  id          String      @id @default(cuid())
+  userId      String
+  from        String
+  replyTo     String?
+  to          String[]    // Array of recipient emails
+  cc          String[]    @default([])
+  bcc         String[]    @default([])
+  subject     String
+  bodyHtml    String      @db.Text
+  bodyText    String?     @db.Text
+  attachments Json?       // Store attachment metadata
+  inReplyTo   String?     // Message-ID of the email being replied to
+  references  String?     @db.Text // References header for email threading
+  isReply     Boolean     @default(false) // Flag to indicate if this is a reply
+  status      EmailStatus @default(PENDING)
+  error       String?     @db.Text
+  sentAt      DateTime?
+  createdAt   DateTime    @default(now())
+
+  // Relations
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailAttachments Attachment[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Attachment {
+  id         String   @id @default(cuid())
+  emailId    String
+  filename   String
+  fileSize   Int
+  mimeType   String
+  blobUrl    String   @db.Text
+  uploadedAt DateTime @default(now())
+
+  // Relations
+  email      Email    @relation(fields: [emailId], references: [id], onDelete: Cascade)
+
+  @@index([emailId])
+}
+
+model RateLimit {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  count      Int      @default(0)
+  windowStart DateTime @default(now())
+
+  @@index([userId])
+}
