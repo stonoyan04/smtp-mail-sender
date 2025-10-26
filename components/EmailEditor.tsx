@@ -42,6 +42,8 @@ export function EmailEditor({ content, onChange }: EmailEditorProps) {
       StarterKit,
       Link.configure({
         openOnClick: false,
+        autolink: true,
+        linkOnPaste: true,
       }),
       TextAlign.configure({
         types: ['heading', 'paragraph'],
@@ -56,6 +58,29 @@ export function EmailEditor({ content, onChange }: EmailEditorProps) {
     content,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML())
+    },
+    editorProps: {
+      handlePaste: (view, event) => {
+        const text = event.clipboardData?.getData('text/plain')
+        if (text && (text.startsWith('http://') || text.startsWith('https://'))) {
+          // If pasting a URL, insert it as visible text with link
+          const { state } = view
+          const { $from } = state.selection
+          const tr = state.tr.insertText(text, $from.pos)
+          view.dispatch(tr)
+          // Then mark it as a link
+          setTimeout(() => {
+            editor?.chain()
+              .focus()
+              .setTextSelection({ from: $from.pos, to: $from.pos + text.length })
+              .setLink({ href: text })
+              .setTextSelection({ from: $from.pos + text.length, to: $from.pos + text.length })
+              .run()
+          }, 0)
+          return true
+        }
+        return false
+      },
     },
   })
 
@@ -105,7 +130,7 @@ export function EmailEditor({ content, onChange }: EmailEditorProps) {
 
   return (
     <div className="border border-gray-300 rounded-lg overflow-hidden">
-      <div className="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap gap-1">
+      <div className="bg-gray-50 border-b border-gray-300 p-1 sm:p-2 flex flex-wrap gap-0.5 sm:gap-1 overflow-x-auto">
         <Button
           size="sm"
           variant="ghost"

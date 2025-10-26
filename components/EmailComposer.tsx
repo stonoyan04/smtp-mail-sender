@@ -31,6 +31,7 @@ export function EmailComposer({ fromAddress, userRole, onSendSuccess }: EmailCom
   const [isReplyMode, setIsReplyMode] = useState(false)
   const [replyData, setReplyData] = useState<ReplyData | null>(null)
   const [parsingEml, setParsingEml] = useState(false)
+  const [editorKey, setEditorKey] = useState(0)
   const emlInputRef = useRef<HTMLInputElement>(null)
 
   const [formData, setFormData] = useState({
@@ -185,6 +186,7 @@ export function EmailComposer({ fromAddress, userRole, onSendSuccess }: EmailCom
       setShowBcc(false)
       setIsReplyMode(false)
       setReplyData(null)
+      setEditorKey(prev => prev + 1) // Force editor to remount and clear
 
       onSendSuccess?.()
     } catch (err: any) {
@@ -195,19 +197,20 @@ export function EmailComposer({ fromAddress, userRole, onSendSuccess }: EmailCom
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">Compose Email</h2>
-        <div className="flex gap-2">
+    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold">Compose Email</h2>
+        <div className="flex gap-2 w-full sm:w-auto">
           <Button
             type="button"
             variant="secondary"
             onClick={() => emlInputRef.current?.click()}
             isLoading={parsingEml}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 text-sm flex-1 sm:flex-initial"
           >
             <Reply className="h-4 w-4" />
-            Reply to EML
+            <span className="hidden xs:inline">Reply to EML</span>
+            <span className="xs:hidden">Reply</span>
           </Button>
           <input
             ref={emlInputRef}
@@ -359,6 +362,7 @@ export function EmailComposer({ fromAddress, userRole, onSendSuccess }: EmailCom
             Message
           </label>
           <EmailEditor
+            key={editorKey}
             content={formData.bodyHtml}
             onChange={(html) => setFormData({ ...formData, bodyHtml: html })}
           />
