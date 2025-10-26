@@ -64,7 +64,6 @@ SMTP_PORT="587"
 SMTP_SECURE="false"
 SMTP_USER="your-email@gmail.com"
 SMTP_PASS="your-app-password"
-SMTP_FROM="Your Company <noreply@example.com>"
 
 # Domain Configuration
 # This domain is used for email validation and placeholders throughout the app
@@ -120,7 +119,6 @@ SMTP_PORT=587
 SMTP_SECURE=false
 SMTP_USER=<your-email>
 SMTP_PASS=<your-app-password>
-SMTP_FROM="Your Company <noreply@example.com>"
 NEXT_PUBLIC_DOMAIN=example.com
 SUPERADMIN_EMAIL=admin@example.com
 SUPERADMIN_PASSWORD=<secure-password>
@@ -165,7 +163,6 @@ SMTP_PORT="587"
 SMTP_SECURE="false"
 SMTP_USER="your-email@gmail.com"
 SMTP_PASS="your-16-char-app-password"
-SMTP_FROM="Your Name <your-email@gmail.com>"
 ```
 
 ## Usage Guide
