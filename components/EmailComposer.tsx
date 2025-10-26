@@ -5,8 +5,7 @@ import { useSession } from 'next-auth/react'
 import { Button } from './ui/Button'
 import { Input } from './ui/Input'
 import { EmailEditor } from './EmailEditor'
-import { FileUploader, UploadedFile } from './FileUploader'
-import { Send, X, Reply, Paperclip, Upload } from 'lucide-react'
+import { Send, X, Reply, Upload } from 'lucide-react'
 
 interface EmailComposerProps {
   fromAddress: string
@@ -29,7 +28,6 @@ export function EmailComposer({ fromAddress, userRole, onSendSuccess }: EmailCom
   const [success, setSuccess] = useState('')
   const [showCc, setShowCc] = useState(false)
   const [showBcc, setShowBcc] = useState(false)
-  const [attachments, setAttachments] = useState<UploadedFile[]>([])
   const [isReplyMode, setIsReplyMode] = useState(false)
   const [replyData, setReplyData] = useState<ReplyData | null>(null)
   const [parsingEml, setParsingEml] = useState(false)
@@ -160,7 +158,6 @@ export function EmailComposer({ fromAddress, userRole, onSendSuccess }: EmailCom
           subject: formData.subject,
           bodyHtml: finalBodyHtml,
           replyTo: formData.replyTo || undefined,
-          attachmentUrls: attachments,
           inReplyTo: isReplyMode ? replyData?.inReplyTo : undefined,
           references: isReplyMode ? replyData?.references : undefined,
           isReply: isReplyMode,
@@ -186,7 +183,6 @@ export function EmailComposer({ fromAddress, userRole, onSendSuccess }: EmailCom
       })
       setShowCc(false)
       setShowBcc(false)
-      setAttachments([])
       setIsReplyMode(false)
       setReplyData(null)
 
@@ -365,12 +361,6 @@ export function EmailComposer({ fromAddress, userRole, onSendSuccess }: EmailCom
           <EmailEditor
             content={formData.bodyHtml}
             onChange={(html) => setFormData({ ...formData, bodyHtml: html })}
-          />
-        </div>
-
-        <div className="border-t border-gray-200 pt-4">
-          <FileUploader
-            onFilesUploaded={setAttachments}
           />
         </div>
 

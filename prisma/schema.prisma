@@ -53,7 +53,6 @@ model Email {
   subject     String
   bodyHtml    String      @db.Text
   bodyText    String?     @db.Text
-  attachments Json?       // Store attachment metadata
   inReplyTo   String?     // Message-ID of the email being replied to
   references  String?     @db.Text // References header for email threading
   isReply     Boolean     @default(false) // Flag to indicate if this is a reply
@@ -63,27 +62,11 @@ model Email {
   createdAt   DateTime    @default(now())
 
   // Relations
-  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  emailAttachments Attachment[]
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([status])
   @@index([createdAt])
-}
-
-model Attachment {
-  id         String   @id @default(cuid())
-  emailId    String
-  filename   String
-  fileSize   Int
-  mimeType   String
-  blobUrl    String   @db.Text
-  uploadedAt DateTime @default(now())
-
-  // Relations
-  email      Email    @relation(fields: [emailId], references: [id], onDelete: Cascade)
-
-  @@index([emailId])
 }
 
 model RateLimit {

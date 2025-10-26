@@ -9,12 +9,6 @@ export interface EmailOptions {
   subject: string
   html: string
   text?: string
-  attachments?: Array<{
-    filename: string
-    content: string | Buffer
-    encoding?: string
-    contentType?: string
-  }>
   inReplyTo?: string
   references?: string
 }
@@ -46,7 +40,6 @@ export async function sendEmail(options: EmailOptions) {
       subject: options.subject,
       html: options.html,
       text: options.text,
-      attachments: options.attachments,
       headers: {
         // Remove unsubscribe link/button added by email providers
         'List-Unsubscribe': '',

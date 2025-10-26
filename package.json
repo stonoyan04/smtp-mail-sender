@@ -23,7 +23,6 @@
     "@tiptap/extension-underline": "^2.6.0",
     "@tiptap/react": "^2.6.0",
     "@tiptap/starter-kit": "^2.6.0",
-    "@vercel/blob": "^2.0.0",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",

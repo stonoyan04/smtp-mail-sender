@@ -14,17 +14,6 @@ const sendEmailSchema = z.object({
   bodyHtml: z.string().min(1),
   bodyText: z.string().optional(),
   replyTo: z.string().email().optional(),
-  attachments: z.array(z.object({
-    filename: z.string(),
-    content: z.string(),
-    encoding: z.string().optional(),
-  })).optional(),
-  attachmentUrls: z.array(z.object({
-    filename: z.string(),
-    blobUrl: z.string(),
-    mimeType: z.string(),
-    size: z.number(),
-  })).optional(),
   inReplyTo: z.string().optional(),
   references: z.string().optional(),
   isReply: z.boolean().optional().default(false),
@@ -89,31 +78,6 @@ export async function POST(request: NextRequest) {
       `
     }
 
-    // Process attachments from Vercel Blob URLs
-    type Attachment = { filename: string; content: string; encoding?: string } | { filename: string; content: Buffer; contentType: string }
-    let attachmentsToSend: Attachment[] = validatedData.attachments || []
-    if (validatedData.attachmentUrls && validatedData.attachmentUrls.length > 0) {
-      const blobAttachments = await Promise.all(
-        validatedData.attachmentUrls.map(async (att) => {
-          try {
-            const response = await fetch(att.blobUrl)
-            const arrayBuffer = await response.arrayBuffer()
-            const buffer = Buffer.from(arrayBuffer)
-            return {
-              filename: att.filename,
-              content: buffer,
-              contentType: att.mimeType,
-            }
-          } catch (error) {
-            console.error(`Failed to fetch attachment ${att.filename}:`, error)
-            return null
-          }
-        })
-      )
-      const validBlobAttachments = blobAttachments.filter(a => a !== null) as Attachment[]
-      attachmentsToSend = [...attachmentsToSend, ...validBlobAttachments]
-    }
-
     // Create email record
     const emailRecord = await prisma.email.create({
       data: {
@@ -126,8 +90,6 @@ export async function POST(request: NextRequest) {
         subject: validatedData.subject,
         bodyHtml: finalBodyHtml,
         bodyText: validatedData.bodyText,
-        attachments: validatedData.attachmentUrls ? JSON.stringify(validatedData.attachmentUrls) :
-                     validatedData.attachments ? JSON.stringify(validatedData.attachments) : undefined,
         inReplyTo: validatedData.inReplyTo,
         references: validatedData.references,
         isReply: validatedData.isReply,
@@ -146,7 +108,6 @@ export async function POST(request: NextRequest) {
         subject: validatedData.subject,
         html: finalBodyHtml,
         text: validatedData.bodyText,
-        attachments: attachmentsToSend,
         inReplyTo: validatedData.inReplyTo,
         references: validatedData.references,
       })
